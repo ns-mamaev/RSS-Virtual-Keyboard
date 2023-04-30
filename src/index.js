@@ -1,5 +1,6 @@
-import createBlock from './components/Keyboard/Keyboard';
+import Keyboard from './components/Keyboard/Keyboard';
+import { keyboardLayout } from './utills/constants';
 import './styles/index.scss';
 
-const block = createBlock();
-document.body.append(block);
+const keyboard = new Keyboard(keyboardLayout);
+keyboard.render(document.body);
