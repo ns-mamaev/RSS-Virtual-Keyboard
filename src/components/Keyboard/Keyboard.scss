@@ -1,4 +1,4 @@
-$key-size: 48px;
+$key-size: 56px;
 
 .keyboard {
   background-color: #171719;
@@ -6,8 +6,8 @@ $key-size: 48px;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  width: 960px;
-  gap: 12px;
+  width: 990px;
+  gap: 6px;
   padding: 10px;
 
   &_hidden {
@@ -73,7 +73,7 @@ $key-size: 48px;
     }
 
     &_type_shift-left {
-      min-width: $key-size * 2.5;
+      min-width: $key-size * 2;
     }
 
     &_type_shift-right {
@@ -81,7 +81,7 @@ $key-size: 48px;
     }
 
     &_type_space {
-      min-width: $key-size * 7.5;
+      min-width: $key-size * 6;
     }
 
     &_type_wide {

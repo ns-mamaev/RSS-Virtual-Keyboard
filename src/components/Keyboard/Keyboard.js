@@ -10,6 +10,7 @@ export default class Keyboard {
     this._shift = false;
     this._langs = langs;
     this._currentLang = localStorage.getItem('lang') || 0;
+    this._textarea.value = 'efeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefwefwfweeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefwefwfwefweffwef';
   }
 
   _createKeyElement(keyData) {
@@ -21,25 +22,32 @@ export default class Keyboard {
       keyEl.classList.add(`keyboard__key_type_${options.widthType}`, 'keyboard__key_type_grow');
     }
 
+    keyEl.setAttribute('data-code', keyCode);
+
     this._keysElements[keyCode] = keyEl;
   }
 
   _updateLayout() {
     const isUpperCase = (this._shift && !this._caps) || (this._caps && !this._shift);
-    const lang = this._langs[this._currentLang]
+    const lang = this._langs[this._currentLang];
     Object.entries(this._keysElements).forEach(([code, keyEl]) => {
       const functionalKey = keysMap.functional[code];
       if (functionalKey) {
         keyEl.textContent = functionalKey;
       } else {
         const { main, shift } = keysMap.symbols[lang][code];
+        let symbol;
         if (shift.toLowerCase() === main) {
-          keyEl.textContent = isUpperCase ? shift : main;
+          symbol = isUpperCase ? shift : main;
+          keyEl.textContent = symbol;
+          keyEl.setAttribute('data-symbol', symbol);
         } else {
+          symbol = this._shift ? shift : main;
           keyEl.innerHTML = `
             <span class=${this._shift ? 'keyboard__key-secondary' : ''}>${main}</span>
             <span class=${this._shift ? '' : 'keyboard__key-secondary'}>${shift}</span>`;
         }
+        keyEl.setAttribute('data-symbol', symbol);
       }
     });
   }
@@ -88,7 +96,54 @@ export default class Keyboard {
   }
 
   handleMouseDown(e) {
-    this._textarea.focus();
+    const key = e.target.closest('.keyboard__key');
+    if (key) {
+      this._textarea.focus();
+      const { code, symbol } = key.dataset;
+      if (symbol) {
+        this._textarea.value += symbol;
+      } else {
+        const { value } = this._textarea;
+        if (code === 'Backspace' && value.length > 0) {
+          this._textarea.value = value.slice(0, -1);
+        } else if (code === 'Tab') {
+          this._textarea.value += ' ';
+        } else if (code === 'Enter') {
+          this._textarea.value += '\n';
+        } else if (code === 'Space') {
+          this._textarea.value += ' ';
+        } else {
+          const { selectionStart } = this._textarea;
+          if (code === 'ArrowLeft' && selectionStart > 0) {
+            this._textarea.selectionStart = selectionStart - 1;
+            // TODO: selection for another arrows
+            if (!e.shiftKey) {
+              this._textarea.selectionEnd = selectionStart - 1;
+            }
+          }
+          if (code === 'ArrowRight' && selectionStart < value.length) {
+            this._textarea.selectionEnd = selectionStart + 1;
+            this._textarea.selectionStart = selectionStart + 1;
+          }
+          if (code === 'ArrowUp' && selectionStart > 0) {
+            let position = selectionStart - this._textarea.cols;
+            if (position < 0) {
+              position = 0;
+            }
+            this._textarea.selectionEnd = position;
+            this._textarea.selectionStart = position;
+          }
+          if (code === 'ArrowDown' && selectionStart < value.length) {
+            let position = selectionStart + this._textarea.cols;
+            if (position > value.length) {
+              position = value.length;
+            }
+            this._textarea.selectionEnd = position;
+            this._textarea.selectionStart = position;
+          }
+        }
+      }
+    }
   }
 
   _addListeners() {
