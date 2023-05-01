@@ -8,9 +8,14 @@ export default class Keyboard {
     this._keysElements = {};
     this._caps = false;
     this._shift = false;
+    this._alt = false;
+    this._control = false;
     this._langs = langs;
     this._currentLang = Number(localStorage.getItem('lang')) || 0;
     this._textarea.value = '123456789';
+    this._shiftSticky = false;
+    this._altSticky = false;
+    this._controlSticky = false;
   }
 
   _createKeyElement(keyData) {
@@ -113,7 +118,6 @@ export default class Keyboard {
     if (code === 'Tab' && type === 'keydown') {
       e.preventDefault();
       this._keysElements.Tab.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-      return;
     }
     if (code.match(/shift/i)) {
       const newShiftState = type === 'keydown';
@@ -121,7 +125,13 @@ export default class Keyboard {
         this._shift = newShiftState;
         this._updateLayout();
       }
+      // if (type === 'keyup') {
+      //   this._keysElements.ShiftLeft.classList.remove('keyboard__key_active');
+      //   this._keysElements.ShiftRight.classList.remove('keyboard__key_active');
+      // }
     }
+
+    this._resetSticky();
   }
 
   _moveSelection(position) {
@@ -136,31 +146,82 @@ export default class Keyboard {
     this._textarea.selectionEnd = newPosition;
   }
 
+  _resetSticky() {
+    if (this._shiftSticky) {
+      this._keysElements.ShiftLeft.classList.remove('keyboard__key_active');
+      this._keysElements.ShiftRight.classList.remove('keyboard__key_active');
+      this._shiftSticky = false;
+      this._shift = false;
+      this._updateLayout();
+    }
+    if (this._altSticky) {
+      this._keysElements.AltLeft.classList.remove('keyboard__key_active');
+      this._keysElements.AltRight.classList.remove('keyboard__key_active');
+      this._altSticky = false;
+      this._alt = false;
+      this._updateLayout();
+    }
+    if (this._controlSticky) {
+      this._keysElements.ControlLeft.classList.remove('keyboard__key_active');
+      this._keysElements.ControlRight.classList.remove('keyboard__key_active');
+      this._controlSticky = false;
+      this._control = false;
+      this._updateLayout();
+    }
+  }
+
   handleMouseDown(e) {
     const key = e.target.closest('.keyboard__key');
     if (!key) {
       return;
     }
     this._textarea.focus();
+
     const { code, symbol } = key.dataset;
+    const { selectionStart, value, cols } = this._textarea;
+
     if (code === 'CapsLock') {
       this._toggleCaps();
       return;
     }
+
     if (code.match(/shift/i)) {
-      console.log(this._shift);
+      this._keysElements.ShiftLeft.classList.toggle('keyboard__key_active');
+      this._keysElements.ShiftRight.classList.toggle('keyboard__key_active');
+      this._shift = !this._shift;
+
       if (this._shift) {
-        this._keysElements.ShiftLeft.classList.remove('keyboard__key_active');
-        this._keysElements.ShiftRight.classList.remove('keyboard__key_active');
-        this._shift = false;
-      } else {
-        this._keysElements.ShiftLeft.classList.add('keyboard__key_active');
-        this._keysElements.ShiftRight.classList.add('keyboard__key_active');
-        this._shift = true;
+        this._shiftSticky = true;
       }
+
       this._updateLayout();
+      return;
     }
-    const { selectionStart, value, cols } = this._textarea;
+    if (code.match(/control/i)) {
+      this._keysElements.ControlLeft.classList.toggle('keyboard__key_active');
+      this._keysElements.ControlRight.classList.toggle('keyboard__key_active');
+      this._control = !this._control;
+
+      if (this._control) {
+        this._controlSticky = true;
+      }
+
+      this._updateLayout();
+      return;
+    }
+    if (code.match(/alt/i)) {
+      this._keysElements.AltLeft.classList.toggle('keyboard__key_active');
+      this._keysElements.AltRight.classList.toggle('keyboard__key_active');
+      this._alt = !this._alt;
+
+      if (this._alt) {
+        this._altSticky = true;
+      }
+
+      this._updateLayout();
+      return;
+    }
+
     if (symbol || code === 'Space') {
       let input = symbol;
       if (!symbol) {
@@ -169,54 +230,43 @@ export default class Keyboard {
       this._textarea.value = value.slice(0, selectionStart)
       + input + value.slice(selectionStart);
       this._moveSelection(selectionStart + 1);
-      return;
     }
+
     if (code === 'Backspace' && value.length > 0) {
       this._textarea.value = value.slice(0, Math.max(selectionStart - 1, 0))
        + value.slice(selectionStart);
       this._moveSelection(selectionStart - 1);
-      return;
     }
     if (code.match(/del/i) && value.length > 0 && selectionStart < value.length) {
       this._textarea.value = value.slice(0, selectionStart) + value.slice(selectionStart + 1);
       this._moveSelection(selectionStart);
-      return;
     }
     if (code.match(/enter/i) && value.length > 0) {
       this._textarea.value = `${value.slice(0, selectionStart)}\n${value.slice(selectionStart)}`;
       this._moveSelection(selectionStart + 1);
-      return;
     }
     if (code === 'Tab') {
       this._textarea.value = `${value.slice(0, selectionStart)}  ${value.slice(selectionStart)}`;
       this._moveSelection(selectionStart + 2);
-      return;
     }
     if (code === 'ArrowLeft' && selectionStart > 0) {
       this._moveSelection(selectionStart - 1);
-      return;
     }
     if (code === 'ArrowRight' && selectionStart < value.length) {
       this._moveSelection(selectionStart + 1);
-      return;
     }
     if (code === 'ArrowUp' && selectionStart > 0) {
       this._moveSelection(selectionStart - cols);
-      return;
     }
     if (code === 'ArrowDown' && selectionStart < value.length) {
       this._moveSelection(selectionStart + cols);
-      return;
     }
     if (code === 'PageUp' && selectionStart > 0) {
       this._moveSelection(0);
-      return;
     }
     if (code === 'PageDown' && selectionStart < value.length) {
       this._moveSelection(value.length);
-      return;
     }
-    // TODO: home btn
   }
 
   _addListeners() {
