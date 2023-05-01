@@ -125,13 +125,9 @@ export default class Keyboard {
         this._shift = newShiftState;
         this._updateLayout();
       }
-      // if (type === 'keyup') {
-      //   this._keysElements.ShiftLeft.classList.remove('keyboard__key_active');
-      //   this._keysElements.ShiftRight.classList.remove('keyboard__key_active');
-      // }
     }
 
-    this._resetSticky();
+    this._resetSticky(code);
   }
 
   _moveSelection(position) {
@@ -146,22 +142,22 @@ export default class Keyboard {
     this._textarea.selectionEnd = newPosition;
   }
 
-  _resetSticky() {
-    if (this._shiftSticky) {
+  _resetSticky(code) {
+    if (this._shiftSticky && !code.match(/shift/i)) {
       this._keysElements.ShiftLeft.classList.remove('keyboard__key_active');
       this._keysElements.ShiftRight.classList.remove('keyboard__key_active');
       this._shiftSticky = false;
       this._shift = false;
       this._updateLayout();
     }
-    if (this._altSticky) {
+    if (this._altSticky && !code.match(/alt/i)) {
       this._keysElements.AltLeft.classList.remove('keyboard__key_active');
       this._keysElements.AltRight.classList.remove('keyboard__key_active');
       this._altSticky = false;
       this._alt = false;
       this._updateLayout();
     }
-    if (this._controlSticky) {
+    if (this._controlSticky && !code.match(/control/i)) {
       this._keysElements.ControlLeft.classList.remove('keyboard__key_active');
       this._keysElements.ControlRight.classList.remove('keyboard__key_active');
       this._controlSticky = false;
@@ -184,6 +180,8 @@ export default class Keyboard {
       this._toggleCaps();
       return;
     }
+
+    this._resetSticky(code);
 
     if (code.match(/shift/i)) {
       this._keysElements.ShiftLeft.classList.toggle('keyboard__key_active');
