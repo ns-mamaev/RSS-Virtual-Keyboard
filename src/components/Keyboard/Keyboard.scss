@@ -22,7 +22,7 @@ $key-size: 56px;
     transition: all 0.1s ease;
     color: #fff;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 18px;
     display: flex;
     column-gap: 4px;
     justify-content: center;
@@ -45,6 +45,10 @@ $key-size: 56px;
     &_active {
       background-color: #d33b0d;
       transform: scale(.95);
+    }
+
+    &:hover:active {
+      opacity: 1;
     }
  
     &_type_grow {

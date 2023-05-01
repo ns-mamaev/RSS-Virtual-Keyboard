@@ -28,7 +28,7 @@ export const keyboardLayout = [
   ['BracketLeft', { color: 'primary' }],
   ['BracketRight', { color: 'primary' }],
   ['Backslash', { color: 'secondary', widthType: 'backslash' }],
-  ['Home', { color: 'secondary' }],
+  ['Insert', { color: 'secondary' }],
   ['CapsLock', { color: 'secondary', widthType: 'capslock' }],
   ['KeyA', { color: 'primary' }],
   ['KeyS', { color: 'primary' }],
