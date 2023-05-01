@@ -16,7 +16,6 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      filename: '[name][contenthash:8].html',
       title: 'Virtual Keyboard',
     }),
     new MiniCssExtractPlugin({
