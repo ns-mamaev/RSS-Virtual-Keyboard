@@ -9,6 +9,7 @@ $key-size: 56px;
   width: 990px;
   gap: 6px;
   padding: 10px;
+  font-family: monospace;
 
   &_hidden {
     display: none;
@@ -22,12 +23,13 @@ $key-size: 56px;
     transition: all 0.1s ease;
     color: #fff;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 16px;
     display: flex;
     column-gap: 4px;
     justify-content: center;
     text-align: left;
     padding: 8px 8px 0;
+    font-family: inherit;
 
     &:hover {
       opacity: .8;

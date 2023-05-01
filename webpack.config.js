@@ -1,12 +1,12 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const path = require('path');
 
 module.exports = {
   entry: { app: './src/index.js' },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[app].js',
+    filename: '[name][contenthash:8].js',
   },
   mode: 'development',
   devServer: {
@@ -15,9 +15,12 @@ module.exports = {
     open: true,
   },
   plugins: [
-    new HtmlWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      filename: '[name][contenthash:8].html',
+      title: 'Virtual Keyboard',
+    }),
     new MiniCssExtractPlugin({
-      filename: '[name].css',
+      filename: '[name][contenthash:8].css',
     }),
   ],
   module: {

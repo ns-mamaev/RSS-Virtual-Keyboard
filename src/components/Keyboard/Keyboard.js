@@ -12,7 +12,6 @@ export default class Keyboard {
     this._control = false;
     this._langs = langs;
     this._currentLang = Number(localStorage.getItem('lang')) || 0;
-    this._textarea.value = '123456789';
   }
 
   _createKeyElement(keyData) {

@@ -11,7 +11,10 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
+    // отключаю, т.к. в классе использую underscore для имен приватных методов
     'no-underscore-dangle': 'off',
+    // пришлось отключить, т.к. линтер ругается на изменение
+    // DOM-элементов через textContent и innerHTML
     'no-param-reassign': 'off',
   },
 };
