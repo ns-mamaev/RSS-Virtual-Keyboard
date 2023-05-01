@@ -1,0 +1,34 @@
+{
+  "name": "virtual-keyboard",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack serve",
+    "lint:js": "eslint ./src --ext .js",
+    "lint:js:fix": "eslint ./src --ext .js --fix",
+    "lint:scss": "stylelint \"**/*.scss\"",
+    "lint:scss:fix": "stylelint \"**/*.scss\" --fix",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "css-loader": "^6.7.3",
+    "eslint": "^8.39.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "gh-pages": "^5.0.0",
+    "html-webpack-plugin": "^5.5.1",
+    "mini-css-extract-plugin": "^2.7.5",
+    "sass": "^1.62.1",
+    "sass-loader": "^13.2.2",
+    "stylelint": "^15.6.0",
+    "stylelint-config-standard-scss": "^9.0.0",
+    "webpack": "^5.81.0",
+    "webpack-cli": "^5.0.2",
+    "webpack-dev-server": "^4.13.3"
+  }
+}

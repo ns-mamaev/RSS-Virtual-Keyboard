@@ -1,0 +1,103 @@
+$key-size: 56px;
+
+.keyboard {
+  background-color: #171719;
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 990px;
+  gap: 6px;
+  padding: 10px;
+  font-family: monospace;
+
+  &_hidden {
+    display: none;
+  }
+
+  &__key {
+    width: $key-size;
+    height: $key-size;
+    border: none;
+    border-radius: 4px;
+    transition: all 0.1s ease;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    column-gap: 4px;
+    justify-content: center;
+    text-align: left;
+    padding: 8px 8px 0;
+    font-family: inherit;
+
+    &:hover {
+      opacity: .8;
+    }
+
+    &_color_primary {
+      background-color: #4f575b;
+    }
+
+    &_color_secondary {
+      background-color: #2f373b;
+    }
+
+    &:active, 
+    &_active {
+      background-color: #d33b0d;
+      transform: scale(.95);
+    }
+
+    &:hover:active {
+      opacity: 1;
+    }
+ 
+    &_type_grow {
+      flex-grow: 1;
+    }
+
+    &_type_tab {
+      min-width: $key-size * 1.2;
+    }
+
+    &_type_backspace {
+      min-width: $key-size * 2;
+    }
+
+    &_type_backslash {
+      min-width: $key-size * 1.4;
+    }
+
+    &_type_enter {
+      min-width: $key-size * 2;
+      flex-grow: 2;
+    }
+
+    &_type_caps-lock {
+      min-width: $key-size * 2;
+    }
+
+    &_type_shift-left {
+      min-width: $key-size * 2;
+    }
+
+    &_type_shift-right {
+      min-width: $key-size * 2;
+    }
+
+    &_type_space {
+      min-width: $key-size * 6;
+    }
+
+    &_type_wide {
+      min-width: $key-size * 1.2;
+    }
+  }
+
+  &__key-secondary {
+    font-size: 10px;
+    margin-top: 4px;
+    opacity: 0.4;
+  }
+}
