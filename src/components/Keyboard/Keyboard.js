@@ -87,6 +87,10 @@ export default class Keyboard {
     if (!keyEl) {
       return;
     }
+    if (keyEl.dataset.symbol && e.type === 'keydown') {
+      e.preventDefault();
+      this._keysElements[e.code].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    }
     if (code === 'CapsLock') {
       if (type === 'keyup') {
         this._toggleCaps();
@@ -141,6 +145,20 @@ export default class Keyboard {
     const { code, symbol } = key.dataset;
     if (code === 'CapsLock') {
       this._toggleCaps();
+      return;
+    }
+    if (code.match(/shift/i)) {
+      console.log(this._shift);
+      if (this._shift) {
+        this._keysElements.ShiftLeft.classList.remove('keyboard__key_active');
+        this._keysElements.ShiftRight.classList.remove('keyboard__key_active');
+        this._shift = false;
+      } else {
+        this._keysElements.ShiftLeft.classList.add('keyboard__key_active');
+        this._keysElements.ShiftRight.classList.add('keyboard__key_active');
+        this._shift = true;
+      }
+      this._updateLayout();
     }
     const { selectionStart, value, cols } = this._textarea;
     if (symbol || code === 'Space') {
