@@ -71,6 +71,11 @@ export const keyboardLayout = [
 
 export const langs = ['en', 'ru'];
 
+export const hotkeys = {
+  ShiftLeft_AltLeft: 'lang',
+  AltLeft_ShiftLeft: 'lang',
+};
+
 export const keysMap = {
   functional: {
     Escape: 'Escape',

@@ -1,4 +1,4 @@
-import { keysMap, langs } from '../../utills/constants';
+import { keysMap, langs, hotkeys } from '../../utills/constants';
 import './Keyboard.scss';
 
 export default class Keyboard {
@@ -13,9 +13,6 @@ export default class Keyboard {
     this._langs = langs;
     this._currentLang = Number(localStorage.getItem('lang')) || 0;
     this._textarea.value = '123456789';
-    this._shiftSticky = false;
-    this._altSticky = false;
-    this._controlSticky = false;
   }
 
   _createKeyElement(keyData) {
@@ -96,6 +93,11 @@ export default class Keyboard {
       e.preventDefault();
       this._keysElements[e.code].dispatchEvent(new MouseEvent('click', { bubbles: true }));
     }
+
+    this._resetFunctionalKeys('Shift');
+    this._resetFunctionalKeys('Alt');
+    this._resetFunctionalKeys('Control');
+
     if (code === 'CapsLock') {
       if (type === 'keyup') {
         this._toggleCaps();
@@ -126,8 +128,6 @@ export default class Keyboard {
         this._updateLayout();
       }
     }
-
-    this._resetSticky(code);
   }
 
   _moveSelection(position) {
@@ -142,28 +142,36 @@ export default class Keyboard {
     this._textarea.selectionEnd = newPosition;
   }
 
-  _resetSticky(code) {
-    if (this._shiftSticky && !code.match(/shift/i)) {
-      this._keysElements.ShiftLeft.classList.remove('keyboard__key_active');
-      this._keysElements.ShiftRight.classList.remove('keyboard__key_active');
-      this._shiftSticky = false;
-      this._shift = false;
+  _resetFunctionalKeys(name, value) {
+    this._keysElements[`${name}Left`].classList[value ? 'add' : 'remove']('keyboard__key_active');
+    this._keysElements[`${name}Right`].classList[value ? 'add' : 'remove']('keyboard__key_active');
+    this[`_${name.toLowerCase()}`] = value;
+
+    if (name === 'Shift') {
       this._updateLayout();
     }
-    if (this._altSticky && !code.match(/alt/i)) {
-      this._keysElements.AltLeft.classList.remove('keyboard__key_active');
-      this._keysElements.AltRight.classList.remove('keyboard__key_active');
-      this._altSticky = false;
-      this._alt = false;
-      this._updateLayout();
+  }
+
+  _checkHotkey(code) {
+    let action;
+    if (this._lastKey) {
+      const hotKey = `${code}_${this._lastKey}`;
+      action = hotkeys[hotKey];
+      this._lastKey = action ? null : code;
+      switch (action) {
+        case 'lang':
+          this._changeLang();
+          this._resetFunctionalKeys('Shift', false);
+          this._resetFunctionalKeys('Alt', false);
+          break;
+        default:
+          break;
+      }
+    } else {
+      this._lastKey = code;
     }
-    if (this._controlSticky && !code.match(/control/i)) {
-      this._keysElements.ControlLeft.classList.remove('keyboard__key_active');
-      this._keysElements.ControlRight.classList.remove('keyboard__key_active');
-      this._controlSticky = false;
-      this._control = false;
-      this._updateLayout();
-    }
+
+    return Boolean(action);
   }
 
   handleMouseDown(e) {
@@ -176,48 +184,43 @@ export default class Keyboard {
     const { code, symbol } = key.dataset;
     const { selectionStart, value, cols } = this._textarea;
 
+    if (this._checkHotkey(code)) {
+      return;
+    }
+
     if (code === 'CapsLock') {
       this._toggleCaps();
       return;
     }
 
-    this._resetSticky(code);
-
-    if (code.match(/shift/i)) {
-      this._keysElements.ShiftLeft.classList.toggle('keyboard__key_active');
-      this._keysElements.ShiftRight.classList.toggle('keyboard__key_active');
-      this._shift = !this._shift;
-
+    if (code.match(/Shift/i)) {
       if (this._shift) {
-        this._shiftSticky = true;
+        this._resetFunctionalKeys('Shift', false);
+      } else {
+        this._resetFunctionalKeys('Shift', true);
       }
-
-      this._updateLayout();
-      return;
+    } else {
+      this._resetFunctionalKeys('Shift', false);
     }
-    if (code.match(/control/i)) {
-      this._keysElements.ControlLeft.classList.toggle('keyboard__key_active');
-      this._keysElements.ControlRight.classList.toggle('keyboard__key_active');
-      this._control = !this._control;
 
-      if (this._control) {
-        this._controlSticky = true;
-      }
-
-      this._updateLayout();
-      return;
-    }
     if (code.match(/alt/i)) {
-      this._keysElements.AltLeft.classList.toggle('keyboard__key_active');
-      this._keysElements.AltRight.classList.toggle('keyboard__key_active');
-      this._alt = !this._alt;
-
       if (this._alt) {
-        this._altSticky = true;
+        this._resetFunctionalKeys('Alt', false);
+      } else {
+        this._resetFunctionalKeys('Alt', true);
       }
+    } else {
+      this._resetFunctionalKeys('Alt', false);
+    }
 
-      this._updateLayout();
-      return;
+    if (code.match(/control/i)) {
+      if (this._control) {
+        this._resetFunctionalKeys('Control', false);
+      } else {
+        this._resetFunctionalKeys('Control', true);
+      }
+    } else {
+      this._resetFunctionalKeys('Control', false);
     }
 
     if (symbol || code === 'Space') {
