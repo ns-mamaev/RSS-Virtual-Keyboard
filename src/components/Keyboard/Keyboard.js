@@ -10,7 +10,7 @@ export default class Keyboard {
     this._shift = false;
     this._langs = langs;
     this._currentLang = localStorage.getItem('lang') || 0;
-    this._textarea.value = 'efeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefwefwfweeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefwefwfwefweffwef';
+    this._textarea.value = '123456789';
   }
 
   _createKeyElement(keyData) {
@@ -95,54 +95,79 @@ export default class Keyboard {
     }
   }
 
+  _moveSelection(position) {
+    let newPosition = position;
+    if (newPosition < 0) {
+      newPosition = 0;
+    }
+    if (newPosition > this._textarea.value.length) {
+      newPosition = this._textarea.value;
+    }
+    this._textarea.selectionStart = newPosition;
+    this._textarea.selectionEnd = newPosition;
+  }
+
   handleMouseDown(e) {
     const key = e.target.closest('.keyboard__key');
     if (key) {
       this._textarea.focus();
       const { code, symbol } = key.dataset;
-      if (symbol) {
-        this._textarea.value += symbol;
-      } else {
-        const { value } = this._textarea;
-        if (code === 'Backspace' && value.length > 0) {
-          this._textarea.value = value.slice(0, -1);
-        } else if (code === 'Tab') {
-          this._textarea.value += ' ';
-        } else if (code === 'Enter') {
-          this._textarea.value += '\n';
-        } else if (code === 'Space') {
-          this._textarea.value += ' ';
-        } else {
-          const { selectionStart } = this._textarea;
-          if (code === 'ArrowLeft' && selectionStart > 0) {
-            this._textarea.selectionStart = selectionStart - 1;
-            // TODO: selection for another arrows
-            if (!e.shiftKey) {
-              this._textarea.selectionEnd = selectionStart - 1;
-            }
-          }
-          if (code === 'ArrowRight' && selectionStart < value.length) {
-            this._textarea.selectionEnd = selectionStart + 1;
-            this._textarea.selectionStart = selectionStart + 1;
-          }
-          if (code === 'ArrowUp' && selectionStart > 0) {
-            let position = selectionStart - this._textarea.cols;
-            if (position < 0) {
-              position = 0;
-            }
-            this._textarea.selectionEnd = position;
-            this._textarea.selectionStart = position;
-          }
-          if (code === 'ArrowDown' && selectionStart < value.length) {
-            let position = selectionStart + this._textarea.cols;
-            if (position > value.length) {
-              position = value.length;
-            }
-            this._textarea.selectionEnd = position;
-            this._textarea.selectionStart = position;
-          }
+      const { selectionStart, value, cols } = this._textarea;
+      if (symbol || code === 'Space') {
+        let input = symbol;
+        if (!symbol) {
+          input = ' ';
         }
+        this._textarea.value = value.slice(0, selectionStart)
+        + input + value.slice(selectionStart);
+        this._moveSelection(selectionStart + 1);
+        return;
       }
+      if (code === 'Backspace' && value.length > 0) {
+        this._textarea.value = value.slice(0, selectionStart - 1) + value.slice(selectionStart);
+        this._moveSelection(selectionStart - 1);
+        return;
+      }
+      if (code.match(/del/i) && value.length > 0 && selectionStart < value.length) {
+        this._textarea.value = value.slice(0, selectionStart) + value.slice(selectionStart + 1);
+        this._moveSelection(selectionStart);
+        return;
+      }
+      if (code.match(/enter/i) && value.length > 0) {
+        this._textarea.value = `${value.slice(0, selectionStart)}\n${value.slice(selectionStart)}`;
+        this._moveSelection(selectionStart + 1);
+        return;
+      }
+      if (code === 'Tab') {
+        this._textarea.value = `${value.slice(0, selectionStart)}  ${value.slice(selectionStart)}`;
+        this._moveSelection(selectionStart + 2);
+        return;
+      }
+      if (code === 'ArrowLeft' && selectionStart > 0) {
+        this._moveSelection(selectionStart - 1);
+        return;
+      }
+      if (code === 'ArrowRight' && selectionStart < value.length) {
+        this._moveSelection(selectionStart + 1);
+        return;
+      }
+      if (code === 'ArrowUp' && selectionStart > 0) {
+        this._moveSelection(selectionStart - cols);
+        return;
+      }
+      if (code === 'ArrowDown' && selectionStart < value.length) {
+        this._moveSelection(selectionStart + cols);
+        return;
+      }
+      if (code === 'PageUp' && selectionStart > 0) {
+        this._moveSelection(0);
+        return;
+      }
+      if (code === 'PageDown' && selectionStart < value.length) {
+        this._moveSelection(value.length);
+        return;
+      }
+      // TODO: home btn
     }
   }
 
