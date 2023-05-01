@@ -1,4 +1,4 @@
-import { keysMap } from '../../utills/constants';
+import { keysMap, langs } from '../../utills/constants';
 import './Keyboard.scss';
 
 export default class Keyboard {
@@ -8,7 +8,8 @@ export default class Keyboard {
     this._keysElements = {};
     this._caps = false;
     this._shift = false;
-    this._currentLang = localStorage.getItem('lang') || 'ru';
+    this._langs = langs;
+    this._currentLang = localStorage.getItem('lang') || 0;
   }
 
   _createKeyElement(keyData) {
@@ -20,19 +21,18 @@ export default class Keyboard {
       keyEl.classList.add(`keyboard__key_type_${options.widthType}`, 'keyboard__key_type_grow');
     }
 
-    keyEl.setAttribute('data-code', keyCode);
-
     this._keysElements[keyCode] = keyEl;
   }
 
   _updateLayout() {
     const isUpperCase = (this._shift && !this._caps) || (this._caps && !this._shift);
+    const lang = this._langs[this._currentLang]
     Object.entries(this._keysElements).forEach(([code, keyEl]) => {
       const functionalKey = keysMap.functional[code];
       if (functionalKey) {
         keyEl.textContent = functionalKey;
       } else {
-        const { main, shift } = keysMap.symbols[this._currentLang][code];
+        const { main, shift } = keysMap.symbols[lang][code];
         if (shift.toLowerCase() === main) {
           keyEl.textContent = isUpperCase ? shift : main;
         } else {
@@ -55,18 +55,35 @@ export default class Keyboard {
     this._element = element;
   }
 
-  handleKeydown(e) {
+  handleKeyAction(e) {
     this._textarea.focus();
-    const key = this._keysElements[e.code];
-    if (key) {
-      key.classList.add('keyboard__key_active');
+    const keyEl = this._keysElements[e.code];
+    if (!keyEl) {
+      return;
     }
-  }
-
-  handleKeyup(e) {
-    const key = this._keysElements[e.code];
-    if (key) {
-      key.classList.remove('keyboard__key_active');
+    if (e.code === 'CapsLock') {
+      if (e.type === 'keyup') {
+        this._caps = !this._caps;
+        this._updateLayout();
+        this._keysElements.CapsLock.classList.toggle('keyboard__key_active');
+      }
+      return;
+    }
+    if (e.code.match(/shift/i)) {
+      const newShiftState = e.type === 'keydown';
+      if (this._shift !== newShiftState) {
+        this._shift = newShiftState;
+        this._updateLayout();
+      }
+    }
+    if (e.altKey && e.shiftKey) {
+      this._currentLang = this._currentLang + 1 < this._langs.length ? this._currentLang + 1 : 0;
+      this._updateLayout();
+    }
+    if (e.type === 'keydown') {
+      keyEl.classList.add('keyboard__key_active');
+    } else {
+      keyEl.classList.remove('keyboard__key_active');
     }
   }
 
@@ -75,8 +92,8 @@ export default class Keyboard {
   }
 
   _addListeners() {
-    window.addEventListener('keydown', (e) => this.handleKeydown(e));
-    window.addEventListener('keyup', (e) => this.handleKeyup(e));
+    window.addEventListener('keydown', (e) => this.handleKeyAction(e));
+    window.addEventListener('keyup', (e) => this.handleKeyAction(e));
     this._element.addEventListener('click', (e) => this.handleMouseDown(e));
   }
 

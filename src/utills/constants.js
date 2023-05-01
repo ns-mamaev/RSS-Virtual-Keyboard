@@ -69,7 +69,7 @@ export const keyboardLayout = [
   ['ArrowRight', { color: 'primary' }],
 ];
 
-export const langs = ['ru', 'en'];
+export const langs = ['en', 'ru'];
 
 export const keysMap = {
   functional: {
